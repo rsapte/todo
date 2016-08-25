@@ -1,0 +1,13 @@
+{
+    "compilerOptions": {
+        "target": "es5",
+        "sourceMap": false,
+        "noImplicitAny": false,
+        "module": "commonjs",
+        "outDir": "../../build/server"
+    },
+    "files": [
+        "./server.ts",
+        "../../typings/index.d.ts"
+    ]
+}
