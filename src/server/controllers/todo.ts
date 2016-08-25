@@ -7,19 +7,21 @@ export class TodoController extends ControllerBase {
 
     constructor() {
         super();
-        this._repo = new TodoModel.TodoRepository('mongodb://127.0.0.1/tododb');
+        this._repo = new TodoModel.TodoRepository('mongodb://localhost/tododb');
     }
 
     public registerRoutes(app: Express.Application) {
-        this.registerRoute(app, 'todos', this._getAllTodos);
-        this.registerRoute(app, 'todos', this._createTodo, 'POST');
+        this.registerRoute(
+            app, 
+            'todos', 
+            (req, res) => this._getAllTodos(req, res), 
+            (req, res) => this._createTodo(req, res));
     }
 
     // GET /todos
     private _getAllTodos(req: Express.Request, res: Express.Response) {
-        this._repo.getTodos()
-        .then(function(todos) {
-            res.json(todos);
+        this._repo.getTodos(function(todos) {
+            res.status(200).json(todos);
         }, function(err) {
             res.send(err);
         });
@@ -31,7 +33,7 @@ export class TodoController extends ControllerBase {
             text: req.body.text,
             done: false
         }).then(function(todo) {
-            res.json(todo);
+            res.status(201).json(todo);
         }, function(err) {
             res.send(err);
         });

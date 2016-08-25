@@ -19,6 +19,7 @@ export class TodoRepository {
         });
 
         this._todoModel = Mongoose.model<ITodo>('Todo', schema);
+        this._connectionString = connectionString;
     }
 
     private _ensureConnected() {
@@ -45,8 +46,17 @@ export class TodoRepository {
         });
     }
 
-    public getTodos() {
+    public getTodos(callback: (todos: ITodo[]) => void, errorCallback?: (err: any) => void) {
         this._ensureConnected();
-        return this._todoModel.find();
+        this._todoModel.find(function(err, todos: ITodo[]) {
+            if(err) {
+                if(errorCallback) {
+                    errorCallback(err);
+                }
+            }
+            else {
+                callback(todos);
+            }
+        });
     }
 }

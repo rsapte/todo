@@ -1,6 +1,7 @@
 import * as Express from 'express';
 import * as Http from 'http';
 import { TodoController } from './controllers/todo';
+import * as BodyParser from 'body-parser';
 
 interface IAppServerConfig {
     port: number;
@@ -27,6 +28,9 @@ class AppServer {
     }
 
     private _configureApp(app: Express.Application) {
+        app.use(BodyParser.json())
+        app.use(BodyParser.urlencoded({ extended: true }));
+
         let controllers = [
             new TodoController()
         ];
@@ -34,8 +38,11 @@ class AppServer {
         for(let controller of controllers) {
             controller.registerRoutes(app);
         }
+
+        
     }
 }
 
-let server = new AppServer({ port: 3000 });
+let port = parseInt(process.argv[2]) || 3000;
+let server = new AppServer({ port: port });
 server.start();

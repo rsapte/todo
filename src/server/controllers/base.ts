@@ -4,15 +4,16 @@ export abstract class ControllerBase {
     protected registerRoute(
         app: Express.Application, 
         path: string, 
-        handler: Express.RequestHandler, 
-        method: string = 'GET') {
+        getHandler?: Express.RequestHandler, 
+        postHandler?: Express.RequestHandler) {
             let fullPath = '/apis/' + path;
-            app.use(fullPath, function(req, res, next) {
-                if(req.method.toLowerCase() === method.toLowerCase()) {
-                    handler(req, res);
-                }
-                next();
-            });
+            if(getHandler) {
+                app.get(fullPath, getHandler);
+            }
+
+            if(postHandler) {
+                app.post(fullPath, postHandler);
+            }
     }
 
     public abstract registerRoutes(app: Express.Application);
