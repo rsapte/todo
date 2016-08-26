@@ -8,9 +8,6 @@ export interface ITodo {
 
 export class TodoRepository {
     private _todoModel: Mongoose.Model<ITodo>;
-
-    private _connection: Mongoose.Mongoose;
-    private _connectionString: string;
     
     constructor(connectionString: string) {
         let schema = new Mongoose.Schema({
@@ -19,44 +16,61 @@ export class TodoRepository {
         });
 
         this._todoModel = Mongoose.model<ITodo>('Todo', schema);
-        this._connectionString = connectionString;
+        Mongoose.connect(connectionString);
     }
 
-    private _ensureConnected() {
-        if(!this._connection) {
-            this._connection = Mongoose.connect(this._connectionString);
-        }
-
-        return this._connection;
-    }
-
-    public dispose() {
-        if(this._connection) {
-            this._connection.disconnect(function(err) {
-                console.log(`Error occurred while trying to disconnect from mongodb ${err}`);
-            });
-        }
-    }
-
-    public createTodo(todo: ITodo) {
-        this._ensureConnected();
-        return this._todoModel.create({
-            text: todo.text,
-            done: todo.done
+    public createTodo(todo: ITodo): Promise<ITodo> {
+        var that = this;
+        let promise = new Promise<ITodo>(function(resolve, reject) {
+            that._todoModel.create({
+                text: todo.text,
+                done: todo.done
+            }).then(function(created) {
+                resolve(created);
+            }, function(err) {
+                reject(err);
+            })
         });
+
+        return promise;
     }
 
-    public getTodos(callback: (todos: ITodo[]) => void, errorCallback?: (err: any) => void) {
-        this._ensureConnected();
-        this._todoModel.find(function(err, todos: ITodo[]) {
-            if(err) {
-                if(errorCallback) {
-                    errorCallback(err);
-                }
-            }
-            else {
-                callback(todos);
-            }
+    public getTodos(): Promise<ITodo[]> {
+        var that = this;
+        let promise = new Promise<ITodo[]>(function(resolve, reject) {
+            that._todoModel.find().then(function(todos) {
+                resolve(todos);
+            }, function(err) {
+                reject(err);
+            })
         });
+
+        return promise;
+    }
+
+    public getTodo(id: string): Promise<ITodo> {
+        var that = this;
+        let promise = new Promise<ITodo>(function(resolve, reject) {
+            that._todoModel.findById(id).then(function(todo) {
+                resolve(todo);
+            }, function(err) {
+                reject(err);
+            })
+        });
+
+        return promise;
+    }
+
+    public deleteTodo(id: string): Promise<ITodo> {
+        var that = this;
+        let promise = new Promise<ITodo>(function(resolve, reject) {
+            that._todoModel.findByIdAndRemove(id).then(function(todo) {
+                resolve(todo);
+            }, function(err) {
+                reject(err);
+            })
+        });
+
+        return promise;
     }
 }
