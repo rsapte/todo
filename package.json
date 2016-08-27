@@ -4,7 +4,9 @@
   "description": "",
   "main": "index.js",
   "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1"
+    "bsw": "tsc --project ./src/server --watch",
+    "bs": "tsc --project ./src/server",
+    "postinstall": "typings install"
   },
   "author": "",
   "license": "ISC",
@@ -13,5 +15,12 @@
     "express": "^4.14.0",
     "mongodb": "^2.2.8",
     "mongoose": "^4.5.10"
+  },
+  "devDependencies": {
+    "html-webpack-plugin": "^2.22.0",
+    "ts-loader": "^0.8.2",
+    "typescript": "^1.8.10",
+    "typings": "^1.3.3",
+    "webpack": "^1.13.2"
   }
 }
